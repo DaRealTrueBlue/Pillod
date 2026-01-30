@@ -1,6 +1,6 @@
 # Pillod - Python Utility Library
 
-A comprehensive Python utility library providing 17 powerful modules with 200+ functions for common programming tasks.
+A comprehensive Python utility library providing 18 powerful modules with 220+ functions for common programming tasks.
 
 ## Table of Contents
 
@@ -67,14 +67,15 @@ config = pillod.configtools.load_json_config("config.json")
 | **randomtools** | Random generation | 15 functions for random numbers, strings, passwords, colors, dates, etc. |
 | **filetools** | File operations | 13 functions for reading, writing, copying, deleting files, etc. |
 | **configtools** | Configuration tools | 6 functions for loading/saving JSON, key-value configs, etc. |
-| **dicttools** | Dictionary operations | 15 functions for merging, filtering, flattening, nested access, etc. |
-| **hashtools** | Hashing and checksums | 8 functions for MD5, SHA256, file hashing, password hashing, etc. |
+| **dicttools** | Dictionary operations | 14 functions for merging, filtering, flattening, nested access, etc. |
+| **hashtools** | Hashing and checksums | 9 functions for MD5, SHA256, file hashing, password hashing, etc. |
 | **jsontools** | JSON utilities | 11 functions for formatting, validation, file operations, etc. |
-| **pathtools** | Path operations | 17 functions for cross-platform path handling, extensions, etc. |
+| **pathtools** | Path operations | 19 functions for cross-platform path handling, extensions, etc. |
 | **regextools** | Regex helpers | 19 functions for pattern matching, extraction, replacement, etc. |
-| **colortools** | Color utilities | 10 functions for hex/RGB conversion, brightness, complementary colors, etc. |
-| **sorttools** | Advanced sorting | 11 functions for custom sorting, natural sort, multi-key sort, etc. |
-| **encryptiontools** | Encryption utilities | 12 functions for base64, ciphers, password hashing, etc. |
+| **colortools** | Color utilities | 11 functions for hex/RGB conversion, brightness, complementary colors, etc. |
+| **sorttools** | Advanced sorting | 12 functions for custom sorting, natural sort, multi-key sort, etc. |
+| **encryptiontools** | Encryption utilities | 13 functions for base64, ciphers, password hashing, etc. |
+| **consoletools** | Console output & logging | 19 functions for tables, colored text, progress bars, logging, etc. |
 
 ---
 
@@ -355,12 +356,23 @@ pillod.dicttools.flatten_dict({'a': {'b': {'c': 1}}})                # {'a_b_c':
 
 # Access nested values
 pillod.dicttools.get_nested({'a': {'b': 1}}, ['a', 'b'])              # 1
+pillod.dicttools.get_dict_values({'a': 1, 'b': 2}, ['a', 'c'], 0)    # [1, 0]
 
 # Set nested values
 pillod.dicttools.set_nested({}, ['a', 'b'], 1)                        # {'a': {'b': 1}}
 
-# Remove None values
+# Remove values
 pillod.dicttools.remove_none_values({'a': 1, 'b': None})              # {'a': 1}
+pillod.dicttools.remove_empty_values({'a': 1, 'b': '', 'c': 0})      # {'a': 1}
+pillod.dicttools.filter_dict_by_value({'a': 1, 'b': 2, 'c': 1}, 1)   # ['a', 'c']
+
+# Convert dict/list
+pillod.dicttools.dict_to_list({'a': 1, 'b': 2})                       # [{'key': 'a', 'value': 1}, {'key': 'b', 'value': 2}]
+pillod.dicttools.list_to_dict([{'id': 1, 'name': 'a'}], 'id', 'name') # {1: 'a'}
+
+# Set operations
+pillod.dicttools.dict_difference({'a': 1}, {'a': 2, 'b': 3})          # {'a', 'b'}
+pillod.dicttools.dict_intersection({'a': 1, 'b': 2}, {'a': 1, 'c': 3}) # {'a': 1}
 ```
 
 ### hashtools
@@ -371,12 +383,16 @@ pillod.dicttools.remove_none_values({'a': 1, 'b': None})              # {'a': 1}
 # Hash strings
 pillod.hashtools.md5_hash("hello")                                    # "5d41402abc4b2a76b9719d911017c592"
 pillod.hashtools.sha256_hash("hello")                                 # "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+pillod.hashtools.sha1_hash("hello")                                   # "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d"
+pillod.hashtools.quick_hash("hello")                                  # Fast non-crypto hash
 
 # Hash files
-pillod.hashtools.file_sha256("document.pdf")                           # "abc123..."
+pillod.hashtools.file_md5("document.pdf")                             # "abc123..."
+pillod.hashtools.file_sha256("document.pdf")                          # "abc123..."
 
 # Verify files match expected hash
-pillod.hashtools.verify_file_hash("file.zip", "abc123...", 'sha256')  # True/False
+pillod.hashtools.verify_file_hash("file.zip", "abc123...", 'sha256') # True/False
+pillod.hashtools.compare_hashes("abc123", "ABC123")                   # True (case-insensitive)
 
 # Password hashing
 pillod.hashtools.hash_password("mypassword", 'sha256')                # Hashed password
@@ -404,6 +420,11 @@ pillod.jsontools.dict_to_json({'name': 'John'})                       # '{"name"
 # Work with JSON files
 pillod.jsontools.json_to_file({'key': 'value'}, "config.json")
 pillod.jsontools.json_from_file("config.json")                        # Returns dict
+pillod.jsontools.json_file_size("config.json")                        # File size in bytes
+
+# Merge and access
+pillod.jsontools.merge_json('{"a": 1}', '{"b": 2}')                   # {'a': 1, 'b': 2}
+pillod.jsontools.get_json_value('{"a": {"b": 1}}', 'a.b')             # 1
 ```
 
 ### pathtools
@@ -417,19 +438,31 @@ pillod.pathtools.join_path("home", "user", "file.txt")                # "home/us
 # Path operations
 pillod.pathtools.normalize_path("../folder/./file.txt")               # "folder/file.txt"
 pillod.pathtools.get_filename("/path/to/file.txt")                    # "file.txt"
+pillod.pathtools.get_filename_without_extension("/path/to/file.txt")  # "file"
 pillod.pathtools.get_extension("/path/to/file.txt")                   # ".txt"
 pillod.pathtools.get_directory("/path/to/file.txt")                   # "/path/to"
+pillod.pathtools.change_extension("file.txt", ".json")                # "file.json"
 
 # Absolute/relative paths
 pillod.pathtools.resolve_path("./file.txt")                           # "/current/dir/file.txt"
+pillod.pathtools.expand_user("~/file.txt")                            # "/home/user/file.txt"
+pillod.pathtools.is_absolute_path("/path/to/file")                    # True
 pillod.pathtools.get_relative_path("/home/user/file", "/home")        # "user/file"
 
 # Path checks
 pillod.pathtools.path_exists("file.txt")                              # True/False
 pillod.pathtools.is_file("file.txt")                                  # True/False
-pillo50+ utility functions**  
-✅ **17 comprehensive modules**  
-✅ **Multi-country support (validators)
+pillod.pathtools.is_directory("folder")                               # True/False
+pillod.pathtools.is_same_path("file1.txt", "file1.txt")               # True
+
+# Advanced operations
+pillod.pathtools.combine_paths("/home", "../user/file")               # "/user/file"
+pillod.pathtools.get_common_path(["/home/a", "/home/b"])              # "/home"
+pillod.pathtools.split_path("/home/user/file.txt")                    # ['/', 'home', 'user', 'file.txt']
+pillod.pathtools.get_parent_directory("/a/b/c/d", 2)                  # "/a/b"
+```
+
+### regextools
 
 **Purpose**: Regular expression helpers
 
@@ -440,6 +473,8 @@ pillod.regextools.find_first_match(r'\d+', "a1b2c3")                 # '1'
 
 # Replace patterns
 pillod.regextools.replace_pattern(r'\d+', 'X', "a1b2c3")             # "aXbXcX"
+pillod.regextools.replace_pattern_count(r'\d+', 'X', "a1b2c3", 1)   # "aXb2c3"
+pillod.regextools.remove_pattern(r'\d+', "a1b2c3")                   # "abc"
 
 # Validate and check
 pillod.regextools.validate_pattern(r'^\d{3}$', "123")                 # True
@@ -447,10 +482,25 @@ pillod.regextools.contains_pattern(r'@', "user@example.com")          # True
 
 # Extract groups
 pillod.regextools.extract_groups(r'(\w+)@(\w+)', "user@example")      # ('user', 'example')
+pillod.regextools.extract_named_groups(r'(?P<user>\w+)@(?P<domain>\w+)', "user@example") # {'user': 'user', 'domain': 'example'}
+
+# Split and manipulate
+pillod.regextools.split_by_pattern(r',', "a,b,c")                     # ['a', 'b', 'c']
+pillod.regextools.escape_pattern("hello.world")                       # "hello\.world"
+
+# Compiled patterns
+compiled = pillod.regextools.compile_pattern(r'\d+')
+pillod.regextools.find_all_with_compiled(compiled, "a1b2c3")         # ['1', '2', '3']
+
+# Advanced searches
+pillod.regextools.case_insensitive_search(r'hello', "HELLO WORLD")  # Match object
+pillod.regextools.multiline_search(r'^line', "line1\nline2")         # Match object
 
 # Special finders
 pillod.regextools.find_emails("Contact me@example.com or user@test.org") # ['me@example.com', 'user@test.org']
 pillod.regextools.find_urls("Visit https://github.com for code")      # ['https://github.com']
+pillod.regextools.find_phone_numbers("Call +1234567890")              # ['+1234567890']
+pillod.regextools.find_numbers("I have 3 apples and 2.5 oranges")    # ['3', '2.5']
 ```
 
 ### colortools
@@ -466,6 +516,7 @@ pillod.colortools.rgb_to_hex(255, 87, 51)                             # "#FF5733
 pillod.colortools.lighten_color("#FF5733", 0.2)                       # Lighter version
 pillod.colortools.darken_color("#FF5733", 0.2)                        # Darker version
 pillod.colortools.complementary_color("#FF5733")                      # "#00A8CC" (opposite)
+pillod.colortools.get_color_brightness("#FF5733")                     # 128 (0-255 scale)
 
 # Color checks
 pillod.colortools.is_valid_color("#FF5733")                           # True
@@ -490,6 +541,11 @@ pillod.sorttools.sort_descending([3, 1, 2])                           # [3, 2, 1
 pillod.sorttools.sort_by_key([1, 2, 3], lambda x: -x)                 # [3, 2, 1]
 pillod.sorttools.natural_sort(['item1', 'item10', 'item2'])           # ['item1', 'item2', 'item10']
 pillod.sorttools.custom_sort(['a', 'b', 'c'], ['c', 'b', 'a'])       # ['c', 'b', 'a']
+pillod.sorttools.reverse_sort([1, 2, 3])                              # [3, 2, 1]
+
+# Multi-key sorting
+people = [{'age': 25, 'name': 'Bob'}, {'age': 25, 'name': 'Alice'}]
+pillod.sorttools.multi_key_sort(people, [(lambda x: x['age'], False), (lambda x: x['name'], False)])
 
 # Dictionary sorting
 pillod.sorttools.sort_dict_by_keys({'c': 1, 'a': 2})                  # {'a': 2, 'c': 1}
@@ -498,6 +554,92 @@ pillod.sorttools.sort_dict_by_values({'a': 2, 'b': 1})                # {'b': 1,
 # Special sorts
 pillod.sorttools.sort_by_length(['a', 'aaa', 'aa'])                   # ['a', 'aa', 'aaa']
 pillod.sorttools.case_insensitive_sort(['Apple', 'apple', 'APPLE'])  # ['Apple', 'apple', 'APPLE']
+pillod.sorttools.sort_with_none_last([3, None, 1, 2])                # [1, 2, 3, None]
+```
+
+### encryptiontools
+
+**Purpose**: Encryption and encoding utilities
+
+```python
+# Base64 encoding
+pillod.encryptiontools.encode_base64("hello world")                   # "aGVsbG8gd29ybGQ="
+pillod.encryptiontools.decode_base64("aGVsbG8gd29ybGQ=")              # "hello world"
+
+# Base64 file operations
+pillod.encryptiontools.encode_base64_file("image.png")                # Returns base64 string
+pillod.encryptiontools.decode_base64_file("base64string", "output.png") # Saves decoded file
+
+# Hex encoding
+pillod.encryptiontools.encode_hex("hello")                            # "68656c6c6f"
+pillod.encryptiontools.decode_hex("68656c6c6f")                       # "hello"
+
+# Simple ciphers (NOT cryptographically secure!)
+pillod.encryptiontools.simple_cipher("hello", 3)                      # Caesar cipher
+pillod.encryptiontools.simple_decipher("khoor", 3)                    # "hello"
+pillod.encryptiontools.xor_cipher("hello", "key")                     # XOR cipher (encrypt & decrypt)
+
+# Password hashing (secure)
+hashed = pillod.encryptiontools.hash_password("mypassword", 'sha256') # Secure hash
+pillod.encryptiontools.verify_password("mypassword", hashed, 'sha256') # True
+pillod.encryptiontools.hash_password_salted("mypassword", "salt123")  # Hash with salt
+pillod.encryptiontools.generate_random_salt(16)                       # Random salt
+```
+
+### consoletools
+
+**Purpose**: Console output, logging, and structured printing
+
+```python
+# Logging setup
+logger = pillod.consoletools.setup_logger('myapp', 'INFO', 'app.log')
+pillod.consoletools.log_info("Application started")
+pillod.consoletools.log_error("Something went wrong!")
+
+# Print tables
+headers = ['Name', 'Age', 'City']
+rows = [
+    ['Alice', 25, 'New York'],
+    ['Bob', 30, 'London'],
+    ['Charlie', 35, 'Tokyo']
+]
+pillod.consoletools.print_table(headers, rows)
+# Output:
+# ┌───────┬─────┬──────────┐
+# │ Name  │ Age │ City     │
+# ├───────┼─────┼──────────┤
+# │ Alice │ 25  │ New York │
+# │ Bob   │ 30  │ London   │
+# └───────┴─────┴──────────┘
+
+# Print boxes
+pillod.consoletools.print_box("Important Message!")
+
+# Colored output (with emoji indicators)
+pillod.consoletools.print_success("Operation completed!")     # ✓ in green
+pillod.consoletools.print_error("Failed to connect")          # ✗ in red
+pillod.consoletools.print_warning("Low disk space")           # ⚠ in yellow
+pillod.consoletools.print_info("Server running")              # ℹ in blue
+
+# Progress bars
+for i in range(1, 101):
+    pillod.consoletools.print_progress_bar(i, 100, prefix='Loading')
+# Output: Loading: |████████████████░░░░| 45.0% (45/100)
+
+# Headers and separators
+pillod.consoletools.print_header("Configuration Settings")
+pillod.consoletools.print_separator()
+
+# Key-value pairs
+pillod.consoletools.print_key_value("Server", "localhost")
+pillod.consoletools.print_key_value("Port", "8080")
+
+# Lists
+pillod.consoletools.print_list(['Option 1', 'Option 2', 'Option 3'])
+
+# Timestamps
+pillod.consoletools.print_timestamp("Server started")
+# Output: [2026-01-31 14:30:00] Server started
 ```
 
 ---
@@ -591,8 +733,8 @@ print(f"Running {loaded['app_name']} v{loaded['version']} on port {loaded['port'
 
 ## Features
 
-✅ **200+ utility functions**  
-✅ **17 comprehensive modules**  
+✅ **220+ utility functions**  
+✅ **18 comprehensive modules**  
 ✅ **Data validation for multiple countries**  
 ✅ **Easy-to-use API**  
 ✅ **No external dependencies** (except standard library)  
