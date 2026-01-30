@@ -62,5 +62,3 @@ env/
 # Project specific
 .env
 local_settings.py
-
-PUBLISHING_GUIDE.md
